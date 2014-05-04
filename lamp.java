@@ -7,6 +7,8 @@ import java.awt.event.*;
 class Lamp extends JFrame {
     Lamp() {
 	Game gui = new Game();
+	this.addKeyListener(gui);
+	this.addMouseMotionListener(gui);
 	this.add(gui);
     }
 
@@ -20,15 +22,47 @@ class Lamp extends JFrame {
 }
 
 // View holds the game
-class Game extends JComponent implements MouseMotionListener {
+class Game extends JComponent implements KeyListener,  MouseMotionListener {
     Player player;
     Block level;
+    Point loc;
 
     Game() {
-	this.addMouseMotionListener(this);
+	player = new Player(0,0);
     }
 
     public void paintComponent(Graphics g) {
+	player.draw(g);
+    }
+
+    //Controls below:
+
+
+    public void keyPressed(KeyEvent e) {
+	int move = 5;
+	int key = e.getKeyCode();
+	System.out.println(key);
+	if (key == 40) { // down
+	    this.player = new Player(this.player.getX(),this.player.getY() + move);
+	    this.repaint();
+	} else if (key == 39) { // right
+	    this.player = new Player(this.player.getX() + move,this.player.getY());
+	    this.repaint();
+	} else if (key == 38) { // up
+	    this.player = new Player(this.player.getX(), this.player.getY() - move );
+	    this.repaint();
+	} else if (key == 37) { // left
+	    this.player = new Player(this.player.getX() - move , this.player.getY());
+	    this.repaint();
+	}
+    }
+
+    public void keyReleased(KeyEvent e) {
+
+    }
+
+    public void keyTyped(KeyEvent e) {
+
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -36,18 +70,37 @@ class Game extends JComponent implements MouseMotionListener {
     }
 
     public void mouseDragged(MouseEvent e) {
+
     }
 }
 
 class Player {
-    int x,y;
+    private int x,y;
 
-    Player() {
+    Player(int x, int y) {
+	this.x = x;
+	this.y = y;
+    }
 
+    public String toString() {
+	String out = "";
+
+	out = out + "(" + this.x + "," + this.y + ")";
+
+	return out;
+    }
+
+    public int getX() {
+	return this.x;
+    }
+
+    public int getY() {
+	return this.y;
     }
 
     public void draw(Graphics g) {
-
+	// fillRect(x,y,w,h)
+	g.fillRect(this.x,this.y,20,20);
     }
 }
 
