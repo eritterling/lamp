@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -22,17 +21,27 @@ class Lamp extends JFrame {
 }
 
 // View holds the game
-class Game extends JComponent implements KeyListener,  MouseMotionListener {
+class Game extends JComponent implements KeyListener,  MouseMotionListener, ActionListener {
     Player player;
     Block level;
-    Point loc;
+    Timer timer;
+    
+    private final int SPEED = 1000;
 
     Game() {
 	player = new Player(0,0);
+	this.timer = new Timer(this.SPEED, this);
+	this.timer.start();
     }
 
     public void paintComponent(Graphics g) {
 	player.draw(g);
+    }
+
+    // the action performed here is the the clock ticking
+    public void actionPerformed(ActionEvent e) {
+	this.player = new Player(this.player.getX(), this.player.getY() + 2);
+	this.repaint();
     }
 
     //Controls below:
@@ -41,7 +50,6 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener {
     public void keyPressed(KeyEvent e) {
 	int move = 5;
 	int key = e.getKeyCode();
-	System.out.println(key);
 	if (key == 40) { // down
 	    this.player = new Player(this.player.getX(),this.player.getY() + move);
 	    this.repaint();
@@ -76,6 +84,8 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener {
 
 class Player {
     private int x,y;
+    // velocity with respect to x and y
+    private double vx, vy;
 
     Player(int x, int y) {
 	this.x = x;
