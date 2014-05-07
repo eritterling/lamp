@@ -26,7 +26,8 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
     Block level;
     Timer timer;
     
-    private final int SPEED = 1000;
+    private final int FPS = 10;
+    private final int SPEED = 1000/FPS;
 
     Game() {
 	player = new Player(0,0);
@@ -40,8 +41,17 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 
     // the action performed here is the the clock ticking
     public void actionPerformed(ActionEvent e) {
-	this.player = new Player(this.player.getX(), this.player.getY() + 2);
+	this.player.move(0.25);
+	System.out.println(this.player);
 	this.repaint();
+    }
+
+    public boolean isValid(Player x) {
+        if ( x.getX() < 400 && x.getX() >= 0 && x.getY() < 400 && x.getY() >= 0 ) {
+	    return true;
+	} else {
+	    return false;
+	}
     }
 
     //Controls below:
@@ -83,19 +93,62 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 }
 
 class Player {
+    // location with respect to two dimensions
     private int x,y;
     // velocity with respect to x and y
     private double vx, vy;
+    // acceleration with respect to x and y
+    private double ax, ay;
 
-    Player(int x, int y) {
-	this.x = x;
-	this.y = y;
+    // Constructors for Player
+
+    // the no args constructor for player puts a player at the origin and sets ay equal to gravity
+    Player() {
+	this.x = 0;
+	this.y = 0;
+	this.vx = 0;
+	this.vy = 0;
+	this.ax = 0;
+	this.ay = 9.81;
     }
+
+    // if you create a player and only give it an x and y it will start with no velocity in any direction
+    // it will also start with ay = -9.81 as gravity, with no ax acceleration
+    Player(int x, int y) {
+	this.x  = x;
+	this.y  = y;
+	this.vx = 0;
+	this.vy = 0;
+	this.ax = 0;
+	this.ay = 9.81;
+    }
+
+    // this constructor sets the velocities and the location by what you give it
+    // acceleration in x is set to 0 and in y it is equal to gravity: -9.81
+    Player(int x, int y, double vx, double vy) {
+	this.x  = x;
+	this.y  = y;
+	this.vx = vx;
+	this.vy = vy;
+	this.ax = 0;
+	this.ay = 9.81;
+    }
+
+    // this is a complet constructor for Player that takes an x,y,vx,vy,ax, and ay
+    Player(int x, int y, double vx, double vy, double ax, double ay) {
+	this.x  = x;
+	this.y  = y;
+	this.vx = vx;
+	this.vy = vy;
+	this.ax = ax;
+	this.ay = ay;
+    }
+
 
     public String toString() {
 	String out = "";
 
-	out = out + "(" + this.x + "," + this.y + ")";
+	out = out + "(" + this.x + "," + this.y + "," + this.vx + "," + this.vy + ")";
 
 	return out;
     }
@@ -106,6 +159,25 @@ class Player {
 
     public int getY() {
 	return this.y;
+    }
+    
+    public void move(double time) {
+	// set new x
+	this.x = (int) (this.x
+			+ (this.vx*time) 
+			+ ((0.5)*this.ax*time*time) );
+
+	// set new y
+	this.y = (int) (this.y
+			+ (this.vy*time)
+			+ ((0.5)*this.ay*time*time) );
+
+	// set new vx
+	this.vx = this.vx + (this.ax*time);
+
+	// set new vy
+	this.vy = this.vy + (this.ay*time);
+	
     }
 
     public void draw(Graphics g) {
