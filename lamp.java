@@ -29,7 +29,7 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
     private final int SPEED = 1000/FPS;
 
     Game() {
-	player = new Player(0,0,0,0,0,2);
+	player = new Player(1,0,0,0,0,0,2);
 	this.timer = new Timer(this.SPEED, this);
 	this.timer.start();
     }
@@ -40,7 +40,7 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 
     // the action performed here is the the clock ticking
     public void actionPerformed(ActionEvent e) {
-	this.player.move(.25);
+	this.player.applyForce(0, 9.81, .75);
 	System.out.println(this.player);
 	if (this.isValid(player)) {
 	} else this.timer.stop();
@@ -48,7 +48,7 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
     }
 
     public boolean isValid(Player x) {
-        if ( x.getX() < 380 && x.getX() >= 0 && x.getY() < 380 && x.getY() >= 0 ) {
+        if ( x.getX() < 300 && x.getX() >= 0 && x.getY() < 300 && x.getY() >= 0 ) {
 	    return true;
 	} else {
 	    return false;
@@ -58,7 +58,8 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
     //Controls below:
 
     public void keyPressed(KeyEvent e) {
-	/*	int move = 5;
+	/*
+	int move = 5;
 	int key = e.getKeyCode();
 	if (key == 40) { // down
 	    this.player = new Player(this.player.getX(),this.player.getY() + move, this.player.getVX(), player.getVY(),);
@@ -72,7 +73,8 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 	} else if (key == 37) { // left
 	    this.player = new Player(this.player.getX() - move , this.player.getY());
 	    this.repaint();
-	    }**/
+        }
+	**/
     }
 
     public void keyReleased(KeyEvent e) {
@@ -93,14 +95,16 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 }
 
 class Player {
+    private double mass; // mass
     private double x,y; // location
     private double vx, vy; // velocity
     private double ax, ay; // acceleration
-    private double fx, fy; // force
-    private double mass; // mass
+
+    private double gravity;
 
     // this is a complet constructor for Player that takes an x,y,vx,vy,ax, and ay
-    Player(double x, double y, double vx, double vy, double ax, double ay) {
+    Player(double mass, double x, double y, double vx, double vy, double ax, double ay) {
+	this.mass = mass;
 	this.x  = x;
 	this.y  = y;
 	this.vx = vx;
@@ -113,7 +117,8 @@ class Player {
     public String toString() {
 	String out = "";
 
-	out = out + "[" + "loc: " + "(" + this.x + "," + this.y + ") ; "
+	out = out + "[ mass: " + this.mass + " ; "
+	    + "loc: " + "(" + this.x + "," + this.y + ") ; "
 	    + "vel: " + "(" + this.vx + "," + this.vy + ") ; "
 	    + "acc: " + "(" + this.ax + "," + this.ay + ")]";
 
@@ -145,16 +150,31 @@ class Player {
 	return this.ay;
     }
 
-    public double getFX() {
-	return this.fx;
-    }
-
-    public double getFY() {
-	return this.fy;
-    }
-
     public double getMass() {
 	return this.mass;
+    }
+
+    public void applyForce(double fx, double fy, double time) {
+	double nm;
+	double nx, ny;
+	double nvx, nvy;
+	double nax, nay;
+
+	nm = this.mass;
+	nax = (fx / nm) + this.ax;
+	nay = (fy / nm) + this.ay;
+	nvx = this.vx + nax * time;
+	nvy = this.vy + nay * time;
+	nx = this.x + this.vx * time + (0.5) * nax * time * time;
+	ny = this.y + this.vy * time + (0.5) * nay * time * time;
+
+	this.mass = nm;
+	this.x = nx;
+	this.y = ny;
+	this.vx = nvx;
+	this.vy = nvy;
+	this.ax = nax;
+	this.ay = nay;
     }
     
     public void move(double time) {
