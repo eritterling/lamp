@@ -24,6 +24,12 @@ class Lamp extends JFrame {
 class Game extends JComponent implements KeyListener,  MouseMotionListener, ActionListener {
     Player player;
     Timer timer;
+
+    // inputs
+    int left  = 0;
+    int right = 0;
+    int up    = 0;
+    int down  = 0;
     
     private final int FPS = 60;
     private final int SPEED = 1000/FPS;
@@ -36,13 +42,17 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 
     public void paintComponent(Graphics g) {
 	player.draw(g);
-	g.drawLine(0,300,400,300);
+	g.drawLine(0,320,400,320);
     }
 
     // the action performed here is the the clock ticking
     public void actionPerformed(ActionEvent e) {
-	this.player.applyForce(0, 9.81, .02);
+	this.player.applyForce((right - left) * 10, (down - up) * 10, .02);
 	System.out.println(this.player);
+	this.right = 0;
+	this.left  = 0;
+	this.up    = 0;
+	this.down  = 0;
 	if (this.isValid(player)) {
 	} else this.timer.stop();
 	this.repaint();
@@ -56,26 +66,18 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
 	}
     }
 
-    //Controls below:
-
+    // pressing one of these keys will increment a counter for that control which is evaluated when actionPerformed
     public void keyPressed(KeyEvent e) {
-	/*
-	int move = 5;
 	int key = e.getKeyCode();
 	if (key == 40) { // down
-	    this.player = new Player(this.player.getX(),this.player.getY() + move, this.player.getVX(), player.getVY(),);
-	    this.repaint();
+	    this.down++;
 	} else if (key == 39) { // right
-	    this.player = new Player(this.player.getX() + move,this.player.getY());
-	    this.repaint();
+	    this.right++;
 	} else if (key == 38) { // up
-	    this.player = new Player(this.player.getX(), this.player.getY() - move );
-	    this.repaint();
+	    this.up++;
 	} else if (key == 37) { // left
-	    this.player = new Player(this.player.getX() - move , this.player.getY());
-	    this.repaint();
+	    this.left++;
         }
-	**/
     }
 
     public void keyReleased(KeyEvent e) {
@@ -101,9 +103,6 @@ class Player {
     private double vx, vy; // velocity
     private double ax, ay; // acceleration
 
-    private double gravity;
-
-    // this is a complet constructor for Player that takes an x,y,vx,vy,ax, and ay
     Player(double mass, double x, double y, double vx, double vy, double ax, double ay) {
 	this.mass = mass;
 	this.x  = x;
@@ -113,7 +112,6 @@ class Player {
 	this.ax = ax;
 	this.ay = ay;
     }
-
 
     public String toString() {
 	String out = "";
@@ -162,8 +160,8 @@ class Player {
 	double nax, nay;
 
 	nm = this.mass;
-	nax = (fx / nm) + this.ax;
-	nay = (fy / nm) + this.ay;
+	nax = (fx / nm);
+	nay = (fy / nm);
 	nvx = this.vx + nax * time;
 	nvy = this.vy + nay * time;
 	nx = this.x + this.vx * time + (0.5) * nax * time * time;
@@ -178,25 +176,6 @@ class Player {
 	this.ay = nay;
     }
     
-    public void move(double time) {
-	// set new x
-	this.x = (int) (this.x
-			+ (this.vx*time) 
-			+ ((0.5)*this.ax*time*time) );
-
-	// set new y
-	this.y = (int) (this.y
-			+ (this.vy*time)
-			+ ((0.5)*this.ay*time*time) );
-
-	// set new vx
-	this.vx = this.vx + (this.ax*time);
-
-	// set new vy
-	this.vy = this.vy + (this.ay*time);
-	
-    }
-
     public void draw(Graphics g) {
 	// fillRect(x,y,w,h)
 	g.fillRect((int) this.x, (int) this.y,20,20);
