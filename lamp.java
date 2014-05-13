@@ -25,22 +25,23 @@ class Game extends JComponent implements KeyListener,  MouseMotionListener, Acti
     Player player;
     Timer timer;
     
-    private final int FPS = 45;
+    private final int FPS = 60;
     private final int SPEED = 1000/FPS;
 
     Game() {
-	player = new Player(1,0,0,0,0,0,2);
+	player = new Player(1,0,0,0,0,0,0);
 	this.timer = new Timer(this.SPEED, this);
 	this.timer.start();
     }
 
     public void paintComponent(Graphics g) {
 	player.draw(g);
+	g.drawLine(0,300,400,300);
     }
 
     // the action performed here is the the clock ticking
     public void actionPerformed(ActionEvent e) {
-	this.player.applyForce(0, 9.81, .75);
+	this.player.applyForce(0, 9.81, .02);
 	System.out.println(this.player);
 	if (this.isValid(player)) {
 	} else this.timer.stop();
